@@ -14,3 +14,8 @@ CREATE TABLE orders(
   shipped_at TIMESTAMP WITH TIMEZONE DEFAULT NULL
 );
 
+CREATE TABLE reports(
+  id SERIAL PRIMARY KEY,
+  day DATE,
+  total_units INT
+);
