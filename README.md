@@ -47,3 +47,53 @@ An entirely different approach would be to store the full stream of SQL commands
 This approach would be usable regardless of whether the PG DB is inside or outside of pachyderm
 
 The new `pg_logical` may have some optimizations for only storing the raw transformed data rather than the full operation that caused the data transform (uncertain, TBD)
+
+
+
+Pete's Peanuts' primary patrons are peckish pachyderms
+
+
+Haven't ordered in the previous 30 days, but ordered at least twice in the 60 days before that.
+
+Pete the Parakeet has asked you for help building his online nut delivery empire.
+
+Three goals:
+
+1. The shipping department needs to know what orders to send out
+2. The retention department wants to identify users who haven't re-ordered recently, before they purchase from another peanut purveyor
+3. Finally, Pete wants to peruse peanut purchases from the previous processing period
+
+pack of peckish pachyderms to pursue
+
+CREATE TYPE pachyderms AS ENUM ('elephant', 'rhino', 'hippo');
+
+CREATE TABLE customers(
+  id SERIAL PRIMARY KEY,
+  name varchar(127),
+  species pachyderms
+);
+
+CREATE TABLE orders(
+  id SERIAL PRIMARY KEY,
+  customer_id integer REFERENCES customers (id),
+  units INT,
+  created_at TIMESTAMP WITH TIMEZONE DEFAULT (now() at time zone 'utc'),
+  shipped_at TIMESTAMP WITH TIMEZONE DEFAULT NULL
+);
+
+1,Rebecca,rhino
+2,Robert,rhino
+3,Ruby,rhino
+4,Ryan,rhino
+5,Eric,elephant
+6,Eddie,elephant
+7,Emma,elephant
+8,Eva,elephant
+9,Henry,hippo
+10,Hugo,hippo
+11,Hazel,hippo
+12,Heidi,hippo
+
+cp -r /pfs/in/raw_pg_import /pfs/out
+postgres
+COPY orders FROM 'orders.csv' DELIMITER ',' CSV HEADER;
