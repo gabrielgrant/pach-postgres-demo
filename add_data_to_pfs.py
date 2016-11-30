@@ -22,7 +22,7 @@ def commit_orders():
         with Popen('pachctl put-file -c orders master orders.csv'.split(), stdin=PIPE, bufsize=-1).stdin as process_in:
             for order in generate_orders(1, current_dt):
                 process_in.write(order)
-        raw_inpout("Done committing orders for day {}. Press Enter to continue...".format(i))
+        raw_input("Done committing orders for day {}. Press Enter to continue...".format(i))
 
 def commit_customers():
     subprocess.check_output('pachctl create-repo customers'.split())
