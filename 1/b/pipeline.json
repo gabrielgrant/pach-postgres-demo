@@ -1,47 +1,19 @@
 {
   "pipeline": {
-    "name": "munge1"
+    "name": "pg-load"
   },
   "transform": {
-    "image": "postgres",
-    "cmd": [
-      "psql",
+    "image": "gabrielgrant/pach-postgres-base",
+    "cmd": [ "psql",
       "--host=$POSTGRES_SERVICE_HOST",
       "--port=$POSTGRES_SERVICE_PORT",
-      "--username=postgres"
+      "--username=postgres",
     ],
     "env": {
-      "PGPASSWORD": "password"
     },
     "stdin": [
-        "for fruit in apple orange banana; do",
-        "   grep $fruit /pfs/data/sales | awk '{print $2}' >>/pfs/out/$fruit",
-        "done"
-    ]
-  },
-  "parallelism_spec": {
-    "strategy": "CONSTANT",
-    "constant": 1
-  },
-  "inputs": [
-    {
-      "repo": {
-        "name": "data"
-      },
-      "method": "map"
-    }
-  ]
-}
-{
-  "pipeline": {
-    "name": "munger"
-  },
-  "transform": {
-    "cmd": [ "sh" ],
-    "stdin": [
-        "for fruit in apple orange banana; do",
-        "   { cat /pfs/prev/$fruit || echo 0; cat /pfs/filter/$fruit; } | awk '{s+=$1} END {print s}' > /pfs/out/$fruit",
-        "done"
+        "COPY customers FROM '/pfs/in/customers/customers.csv' DELIMITER ',' CSV HEADER;",
+        "COPY orders FROM '/pfs/in/orders/orders.csv' DELIMITER ',' CSV HEADER;"
     ],
     "overwrite": true
   },
@@ -52,12 +24,81 @@
   "inputs": [
     {
       "repo": {
-        "name": "filter"
+        "name": "customers"
       },
-      "method": {
-        "partition": "FILE",
-        "incremental": "DIFF"
-      }
+      "method": "map"
+    },
+    {
+      "repo": {
+        "name": "orders"
+      },
+      "method": "map"
+    }
+  ]
+}
+
+
+{
+  "pipeline": {
+    "name": "pg-reports"
+  },
+  "transform": {
+    "image": "gabrielgrant/pach-postgres-demo-reports",
+    "cmd": [ "psql",
+      "--host=$POSTGRES_SERVICE_HOST",
+      "--port=$POSTGRES_SERVICE_PORT",
+      "--username=postgres",
+    ],
+    "env": {
+      "PGDATA_INPUT_REPO": "pg-load"
+    },
+    "stdin": [
+        ""
+    ],
+    "overwrite": true
+  },
+  "parallelism_spec": {
+    "strategy": "CONSTANT",
+    "constant": 1
+  },
+  "inputs": [
+    {
+      "repo": {
+        "name": "pg-load"
+      },
+      "method": "map"
+    }
+  ]
+}
+
+{
+  "pipeline": {
+    "name": "pg-dump"
+  },
+  "transform": {
+    "image": "gabrielgrant/pach-postgres-base",
+    "cmd": [ "psql",
+      "--host=$POSTGRES_SERVICE_HOST",
+      "--port=$POSTGRES_SERVICE_PORT",
+      "--username=postgres",
+    ],
+    "env": {
+      "PGDATA": "/pfs/pg-reports"
+    },
+    "stdin": [
+        "COPY reports TO '/pfs/out/reports.csv' DELIMITER ',' CSV HEADER;"
+    ]
+  },
+  "parallelism_spec": {
+    "strategy": "CONSTANT",
+    "constant": 1
+  },
+  "inputs": [
+    {
+      "repo": {
+        "name": "pg-reports"
+      },
+      "method": "map"
     }
   ]
 }
