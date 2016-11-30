@@ -9,6 +9,10 @@
       "PGDATA_INPUT_REPO": "pg-load"
     },
     "stdin": [
+        "ls /pfs",
+        "ls /pfs/orders",
+        "ls /pfs/customers",
+        "ls /pfs/out",
         "\"COPY customers FROM '/pfs/customers/customers.csv' DELIMITER ',' CSV HEADER;",
         "COPY orders FROM '/pfs/orders/orders.csv' DELIMITER ',' CSV HEADER;",
         "INSERT into reports (day, total_units) (",
@@ -18,6 +22,7 @@
           "ORDER BY count(created_at) DESC",
         ");",
         "COPY reports TO '/pfs/out/reports.csv' DELIMITER ',' CSV HEADER;\" | psql --host=$POSTGRES_SERVICE_HOST --port=$POSTGRES_SERVICE_PORT --username=postgres"
+        "ls /pfs/out",
     ]
   },
   "parallelism_spec": {
