@@ -3,7 +3,7 @@
     "name": "pg-load"
   },
   "transform": {
-    "image": "gabrielgrant/pach-postgres-base",
+    "image": "gabrielgrant/pach-postgres-demo-pg-load",
     "cmd": [ "psql",
       "--host=$POSTGRES_SERVICE_HOST",
       "--port=$POSTGRES_SERVICE_PORT",
