@@ -4,16 +4,12 @@
   },
   "transform": {
     "image": "gabrielgrant/pach-postgres-base",
-    "cmd": [ "psql",
-      "--host=$POSTGRES_SERVICE_HOST",
-      "--port=$POSTGRES_SERVICE_PORT",
-      "--username=postgres"
-    ],
+    "cmd": [ "/bin/bash" ],
     "env": {
       "PGDATA_INPUT_REPO": "pg-load"
     },
     "stdin": [
-        "COPY customers FROM '/pfs/in/customers/customers.csv' DELIMITER ',' CSV HEADER;",
+        "\"COPY customers FROM '/pfs/in/customers/customers.csv' DELIMITER ',' CSV HEADER;",
         "COPY orders FROM '/pfs/in/orders/orders.csv' DELIMITER ',' CSV HEADER;",
         "INSERT into reports (day, total_units) (",
           "SELECT date_trunc('day', created_at) as day, SUM(units) as total_units",
@@ -21,7 +17,10 @@
           "GROUP BY date(created_at)",
           "ORDER BY count(created_at) DESC",
         ");",
-        "COPY reports TO '/pfs/out/reports.csv' DELIMITER ',' CSV HEADER;"
+        "COPY reports TO '/pfs/out/reports.csv' DELIMITER ',' CSV HEADER;\" | psql",
+        "--host=$POSTGRES_SERVICE_HOST",
+        "--port=$POSTGRES_SERVICE_PORT",
+        "--username=postgres"
     ]
   },
   "parallelism_spec": {
