@@ -22,8 +22,7 @@
           "ORDER BY count(created_at) DESC",
         ");",
         "COPY reports TO '/pfs/out/reports.csv' DELIMITER ',' CSV HEADER;"
-    ],
-    "overwrite": true
+    ]
   },
   "parallelism_spec": {
     "strategy": "CONSTANT",
