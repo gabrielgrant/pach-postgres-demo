@@ -1,6 +1,6 @@
 {
   "pipeline": {
-    "name": "pg-reports"
+    "name": "reports"
   },
   "transform": {
     "image": "gabrielgrant/pach-postgres-base",
