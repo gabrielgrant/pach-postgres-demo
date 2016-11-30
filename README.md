@@ -8,7 +8,16 @@ bash <(wget -qO- https://github.com/gabrielgrant/pach-postgres-demo/blob/master/
 There are several options for how to integrate with PG data
 
 
-## 1. PG Running in Pachyderm
+
+
+## 1. Dump to Pachyderm, Process, then Load
+
+The most "pure" way to analyze data with Pachyderm today is to have it handle the data storage and analysis end-to-end. This likely means regularly dumping a live database, importing that data dump into the Pachyderm FileSystem (PFS), doing the processing all within Pachyderm Pipeline System (PPS) code, and then exporting the output data back into whatever system needs to consume these results.
+
+If the database is currently being used a simple data store, with client code loading data, performing analysis locally, and then dumping results back to the DB, this may be a fairly simple change. If there are more advanced database features being used to perform analysis or mutation of the data, converting to use a Pachyderm-only process could require significant reworking of the existing codebase.
+
+
+## 2. PG Running in Pachyderm
 
 The simplest approaches involve running Postgres within Pachyderm itself. The upside is simplicity, and that everything is "within the system". The downside is that this entails potentially-significant data transfer overhead[1] and either some wasted processing time to dump & reload data at each stage (option #1.A), or some wasted storage space due to completely duplicated dumps (option #1.B)[2].
 
@@ -23,7 +32,8 @@ copy from /pfs/in to /pfs/out before starting the PG server & running analysis
 
 Note: this seems to me like the best option in most cases ATM
 
-## 2. PG Running Outside Pachyderm
+
+## 3. PG Running Outside Pachyderm
 
 A more optimized option is to run one (or several) PG servers outside of Pachyderm, likely as a service on Kubernetes. The first pipeline creates a new logical database with unique ID, and loads the input data. When done it's analysis, it outputs that database's ID for the next pipeline stage to start.
 
@@ -40,7 +50,7 @@ A more complex option is to have a given pipeline stage only output the unique D
 In order to safeguard against a subsequent 
 
 
-## 3. Log storage alternative
+## 4. Log storage alternative
 
 An entirely different approach would be to store the full stream of SQL commands 
 
@@ -50,50 +60,13 @@ The new `pg_logical` may have some optimizations for only storing the raw transf
 
 
 
-Pete's Peanuts' primary patrons are peckish pachyderms
 
 
-Haven't ordered in the previous 30 days, but ordered at least twice in the 60 days before that.
+## Example: Pete's Peanuts
 
-Pete the Parakeet has asked you for help building his online nut delivery empire.
+Pete the Parakeet has built an online nut delivery empire, but wants better visibility into how his sales are going. We're going to dump his production DB, load it into PostgreSQL for analysis, and output a daily generated report.
 
-Three goals:
 
-1. The shipping department needs to know what orders to send out
-2. The retention department wants to identify users who haven't re-ordered recently, before they purchase from another peanut purveyor
-3. Finally, Pete wants to peruse peanut purchases from the previous processing period
 
-pack of peckish pachyderms to pursue
 
-CREATE TYPE pachyderms AS ENUM ('elephant', 'rhino', 'hippo');
 
-CREATE TABLE customers(
-  id SERIAL PRIMARY KEY,
-  name varchar(127),
-  species pachyderms
-);
-
-CREATE TABLE orders(
-  id SERIAL PRIMARY KEY,
-  customer_id integer REFERENCES customers (id),
-  units INT,
-  created_at TIMESTAMP WITH TIMEZONE DEFAULT (now() at time zone 'utc'),
-  shipped_at TIMESTAMP WITH TIMEZONE DEFAULT NULL
-);
-
-1,Rebecca,rhino
-2,Robert,rhino
-3,Ruby,rhino
-4,Ryan,rhino
-5,Eric,elephant
-6,Eddie,elephant
-7,Emma,elephant
-8,Eva,elephant
-9,Henry,hippo
-10,Hugo,hippo
-11,Hazel,hippo
-12,Heidi,hippo
-
-cp -r /pfs/in/raw_pg_import /pfs/out
-postgres
-COPY orders FROM 'orders.csv' DELIMITER ',' CSV HEADER;
