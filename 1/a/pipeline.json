@@ -21,8 +21,8 @@
           "GROUP BY date(created_at)",
           "ORDER BY count(created_at) DESC",
         ");",
-        "COPY reports TO '/pfs/out/reports.csv' DELIMITER ',' CSV HEADER;\" | psql --host=$POSTGRES_SERVICE_HOST --port=$POSTGRES_SERVICE_PORT --username=postgres"
-        "ls /pfs/out",
+        "COPY reports TO '/pfs/out/reports.csv' DELIMITER ',' CSV HEADER;\" | psql --host=$POSTGRES_SERVICE_HOST --port=$POSTGRES_SERVICE_PORT --username=postgres",
+        "ls /pfs/out"
     ]
   },
   "parallelism_spec": {
