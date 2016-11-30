@@ -19,9 +19,9 @@ def commit_orders():
     print("Committing orders for day 1...")
     for i in itertools.count():
         current_dt = now + (timedelta(days=1) * i)
-        with Popen('pachctl put-file -c orders master orders.csv'.split(), stdin=PIPE, bufsize=-1) as process:
+        with Popen('pachctl put-file -c orders master orders.csv'.split(), stdin=PIPE, bufsize=-1).stdin as process_in:
             for order in generate_orders(1, current_dt):
-                process.stdin.write(order)
+                process_in.write(order)
         raw_inpout("Done committing orders for day {}. Press Enter to continue...".format(i))
 
 def commit_customers():
