@@ -9,8 +9,8 @@
       "PGDATA_INPUT_REPO": "pg-load"
     },
     "stdin": [
-        "\"COPY customers FROM '/pfs/in/customers/customers.csv' DELIMITER ',' CSV HEADER;",
-        "COPY orders FROM '/pfs/in/orders/orders.csv' DELIMITER ',' CSV HEADER;",
+        "\"COPY customers FROM '/pfs/customers/customers.csv' DELIMITER ',' CSV HEADER;",
+        "COPY orders FROM '/pfs/orders/orders.csv' DELIMITER ',' CSV HEADER;",
         "INSERT into reports (day, total_units) (",
           "SELECT date_trunc('day', created_at) as day, SUM(units) as total_units",
           "FROM orders",
