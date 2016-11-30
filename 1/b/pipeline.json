@@ -7,7 +7,7 @@
     "cmd": [ "psql",
       "--host=$POSTGRES_SERVICE_HOST",
       "--port=$POSTGRES_SERVICE_PORT",
-      "--username=postgres",
+      "--username=postgres"
     ],
     "env": {
     },
@@ -47,7 +47,7 @@
     "cmd": [ "psql",
       "--host=$POSTGRES_SERVICE_HOST",
       "--port=$POSTGRES_SERVICE_PORT",
-      "--username=postgres",
+      "--username=postgres"
     ],
     "env": {
       "PGDATA_INPUT_REPO": "pg-load"
@@ -85,7 +85,7 @@
     "cmd": [ "psql",
       "--host=$POSTGRES_SERVICE_HOST",
       "--port=$POSTGRES_SERVICE_PORT",
-      "--username=postgres",
+      "--username=postgres"
     ],
     "env": {
       "PGDATA": "/pfs/pg-reports"
