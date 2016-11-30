@@ -43,7 +43,7 @@
     "name": "pg-reports"
   },
   "transform": {
-    "image": "gabrielgrant/pach-postgres-demo-reports",
+    "image": "gabrielgrant/pach-postgres-pfs-pgdata",
     "cmd": [ "psql",
       "--host=$POSTGRES_SERVICE_HOST",
       "--port=$POSTGRES_SERVICE_PORT",
@@ -53,7 +53,12 @@
       "PGDATA_INPUT_REPO": "pg-load"
     },
     "stdin": [
-        ""
+        "INSERT into reports (day, total_units) (",
+          "SELECT date_trunc('day', created_at) as day, SUM(units) as total_units",
+          "FROM orders",
+          "GROUP BY date(created_at)",
+          "ORDER BY count(created_at) DESC",
+        ");"
     ],
     "overwrite": true
   },
